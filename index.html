@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARAVALI AIRLINE - Final Goodbye</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #001F4D;
+            --secondary-color: #E4002B;
+            --accent-color: #FFD700;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0f5ff 0%, #ffffff 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            width: 100%;
+            background: linear-gradient(90deg, var(--primary-color) 0%, #002b5c 100%);
+            padding: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            animation: slideDown 0.8s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .header img {
+            height: 50px;
+            width: auto;
+        }
+
+        .header-text {
+            color: white;
+            text-align: center;
+        }
+
+        .header-text h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+        }
+
+        .header-text p {
+            margin: 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            flex: 1;
+            width: 100%;
+            max-width: 1200px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input-group {
+            margin: 2rem 0;
+            text-align: center;
+            animation: fadeInUp 1s ease;
+        }
+
+        .flight-container {
+            position: relative;
+            margin: 2rem 0;
+            perspective: 1000px;
+        }
+
+        #boarding-pass-container {
+            position: relative;
+            width: 1000px;
+            max-width: 100%;
+            margin: 0 auto;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        #boarding-pass-image {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .passenger-name {
+            position: absolute;
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 24px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        #left-name {
+            left: 145px;
+            top: 130px;
+        }
+
+        #right-name {
+            left: 712px;
+            top: 145px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .input-field {
+            position: relative;
+            margin: 2rem 0;
+        }
+
+        .input-field input {
+            padding: 1.2rem 2rem;
+            font-size: 1.1rem;
+            width: 300px;
+            max-width: 90%;
+            border: 2px solid var(--primary-color);
+            border-radius: 50px;
+            background: rgba(255,255,255,0.9);
+            transition: all 0.3s ease;
+        }
+
+        .input-field input:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(0,31,77,0.2);
+            transform: scale(1.02);
+        }
+
+        .generate-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,31,77,0.3);
+        }
+
+        .generate-btn:hover {
+            background: #002b5c;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,31,77,0.4);
+        }
+
+        .generate-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            #boarding-pass-container {
+                width: 100%;
+                border-radius: 10px;
+            }
+
+            .passenger-name {
+                font-size: 18px;
+            }
+
+            #left-name {
+                left: 12%;
+                top: 18%;
+            }
+
+            #right-name {
+                left: 62%;
+                top: 19%;
+                font-size: 14px;
+            }
+
+            .header-text h1 {
+                font-size: 1.4rem;
+            }
+
+            .input-field input {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+
+            .generate-btn {
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #left-name {
+                left: 10%;
+                top: 16%;
+                font-size: 16px;
+            }
+
+            #right-name {
+                left: 60%;
+                top: 17%;
+                font-size: 12px;
+            }
+
+            .header {
+                padding: 0.8rem;
+            }
+
+            .header img {
+                height: 40px;
+            }
+        }
+
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--primary-color);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <!-- Add your school logo path here -->
+        <img src="school.png" alt="School Logo">
+        <div class="header-text">
+            <h1>ARAVALI AIRLINES</h1>
+            <p>A Final Goodbye ✈️ Memories That Soar High</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="input-group">
+            <div class="input-field">
+                <input type="text" id="name-input" placeholder="Enter Your Full Name">
+            </div>
+            <button class="generate-btn" onclick="generatePDF()">
+                ✈️ Generate Boarding Pass
+            </button>
+        </div>
+
+        <div class="flight-container">
+            <div id="boarding-pass-container">
+                <img src="boarding-pass.png" id="boarding-pass-image">
+                <div class="passenger-name" id="left-name"></div>
+                <div class="passenger-name" id="right-name"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        function generatePDF() {
+            const userName = document.getElementById('name-input').value.trim();
+            if (!userName) {
+                alert('Please enter your name');
+                return;
+            }
+
+            // Show loading spinner
+            document.querySelector('.loading').style.display = 'flex';
+
+            // Update both name fields
+            document.getElementById('left-name').textContent = userName;
+            document.getElementById('right-name').textContent = userName;
+
+            setTimeout(() => {
+                html2canvas(document.querySelector("#boarding-pass-container"), {
+                    scale: 2,
+                    logging: true,
+                    useCORS: true
+                }).then(canvas => {
+                    const imgWidth = 1000;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    const pdf = new jspdf.jsPDF({
+                        orientation: 'landscape',
+                        unit: 'px',
+                        format: [imgWidth, imgHeight]
+                    });
+
+                    pdf.addImage(canvas, 'PNG', 0, 0, imgWidth, imgHeight);
+                    pdf.save(`${userName.toLowerCase().replace(/\s+/g, '-')}-boarding-pass.pdf`);
+                    
+                    // Hide loading spinner
+                    document.querySelector('.loading').style.display = 'none';
+                }).catch(error => {
+                    console.error('Error generating PDF:', error);
+                    document.querySelector('.loading').style.display = 'none';
+                });
+            }, 500);
+        }
+    </script>
+</body>
+</html>
