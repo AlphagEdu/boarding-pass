@@ -3,22 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARAVALI AIRLINE - Final Goodbye</title>
+    <title>ARAVALI AIRLINES - Final Journey</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #001F4D;
+            --primary-color: #f42f2f;
             --secondary-color: #E4002B;
             --accent-color: #FFD700;
         }
+
+        /* Plane Animation */
+        .plane-container {
+            position: fixed;
+            top: 50%;
+            left: -100px;
+            animation: fly 15s linear infinite;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        @keyframes fly {
+            0% { transform: translate(0, -50%); }
+            100% { transform: translate(150vw, -50%); }
+        }
+
+        /* Enhanced Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #002b5c 100%);
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent 25%,
+                rgba(255,255,255,0.1) 50%,
+                transparent 75%
+            );
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            100% { left: 100%; }
+        }
+
+        /* Improved Form Styling */
+        .input-group {
+            background: rgba(255,255,255,0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin: 2rem auto;
+            max-width: 600px;
+        }
+
+        .input-field {
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .input-field input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Success Modal */
+        .success-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            z-index: 1000;
+        }
+
 
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: linear-gradient(135deg, #f0f5ff 0%, #ffffff 100%);
+            background: linear-gradient(135deg, #3e3e3e 0%, #000000 %);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -194,8 +279,22 @@
                 border-radius: 10px;
             }
 
+        @media (max-width: 768px) {
+            #boarding-pass-container {
+                transform: scale(0.8);
+                margin: 20px 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #boarding-pass-container {
+                transform: scale(0.7);
+            }
+        }
+
             .passenger-name {
                 font-size: 18px;
+                pointer-events: none;
             }
 
             #left-name {
@@ -271,13 +370,27 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        .data-fields {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* PDF Size Fix */
+        #boarding-pass-container {
+            width: 1000px;
+            height: 600px; /* Match your image aspect ratio */
+        }
+        
     </style>
 </head>
 <body>
+    <div class="plane-container">
+        <i class="fas fa-plane fa-3x"></i>
+    </div>
+
     <div class="header">
-        <!-- Add your school logo path here -->
-        <img src="school.png" alt="School Logo">
-        <div class="header-text">
             <h1>ARAVALI AIRLINES</h1>
             <p>A Final Goodbye ✈️ Memories That Soar High</p>
         </div>
@@ -285,13 +398,23 @@
 
     <div class="container">
         <div class="input-group">
-            <div class="input-field">
-                <input type="text" id="name-input" placeholder="Enter Your Full Name">
+            <div class="data-fields">
+                <div class="input-field">
+                    <input type="text" id="name-input" placeholder="Full Name *" required>
+                </div>
+                <div class="input-field">
+                    <input type="text" id="class-input" placeholder="Class">
+                </div>
+                <div class="input-field">
+                    <input type="tel" id="phone-input" placeholder="Phone Number">
+                </div>
             </div>
             <button class="generate-btn" onclick="generatePDF()">
                 ✈️ Generate Boarding Pass
             </button>
         </div>
+
+    </div>
 
         <div class="flight-container">
             <div id="boarding-pass-container">
@@ -306,7 +429,21 @@
         <div class="spinner"></div>
     </div>
 
+
+    <div class="success-modal" id="successModal">
+        <h3>Boarding Pass Generated Successfully! 🎫</h3>
+        <p>Your PDF is ready for download.</p>
+        <button class="generate-btn" onclick="document.getElementById('successModal').style.display = 'none'">
+            Close
+        </button>
+    </div>
+
     <script>
+
+
+  
+
+
         function generatePDF() {
             const userName = document.getElementById('name-input').value.trim();
             if (!userName) {
@@ -314,39 +451,59 @@
                 return;
             }
 
-            // Show loading spinner
-            document.querySelector('.loading').style.display = 'flex';
+            // Store original dimensions
+            const container = document.getElementById('boarding-pass-container');
+            const originalWidth = container.style.width;
+            const originalHeight = container.style.height;
+
+            // Force laptop layout dimensions
+            container.style.width = '1000px';
+            container.style.height = 'auto';
 
             // Update both name fields
             document.getElementById('left-name').textContent = userName;
             document.getElementById('right-name').textContent = userName;
 
+            // Add rendering delay
             setTimeout(() => {
-                html2canvas(document.querySelector("#boarding-pass-container"), {
+                html2canvas(container, {
                     scale: 2,
                     logging: true,
-                    useCORS: true
+                    useCORS: true,
+                    width: 1000, // Force canvas width
+                    height: 600, // Adjust based on your image height
+                    windowWidth: 1000 // Force render width
                 }).then(canvas => {
-                    const imgWidth = 1000;
-                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                    
                     const pdf = new jspdf.jsPDF({
                         orientation: 'landscape',
                         unit: 'px',
-                        format: [imgWidth, imgHeight]
+                        format: [1000, 600] // Match your image dimensions
                     });
 
-                    pdf.addImage(canvas, 'PNG', 0, 0, imgWidth, imgHeight);
-                    pdf.save(`${userName.toLowerCase().replace(/\s+/g, '-')}-boarding-pass.pdf`);
-                    
-                    // Hide loading spinner
+                    pdf.addImage(canvas, 'PNG', 0, 0, 1000, 600);
+                    pdf.save(`${userName}-boarding-pass.pdf`);
+
+                    // Reset container dimensions
+                    container.style.width = originalWidth;
+                    container.style.height = originalHeight;
                     document.querySelector('.loading').style.display = 'none';
                 }).catch(error => {
-                    console.error('Error generating PDF:', error);
+                    console.error('Error:', error);
+                    container.style.width = originalWidth;
+                    container.style.height = originalHeight;
                     document.querySelector('.loading').style.display = 'none';
                 });
             }, 500);
         }
-    </script>
+        document.getElementById('successModal').style.display = 'block';
+
+
+        function adjustPDFSize() {
+            const container = document.getElementById('boarding-pass-container');
+            container.style.width = 'auto';
+            container.style.height = 'auto'; // Match your image ratio
+        }
+
+        </script>
 </body>
 </html>
