@@ -3,178 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARAVALI AIRLINES - Final Journey</title>
+    <title>ARAVALI Airlines - Boarding Pass</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #f42f2f;
-            --secondary-color: #E4002B;
-            --accent-color: #FFD700;
+            --primary: #D71921;
+            --secondary: #001538;
+            --accent: #FFD700;
+            --text: #2D2D2D;
         }
 
-        /* Plane Animation */
-        .plane-container {
-            position: fixed;
-            top: 50%;
-            left: -100px;
-            animation: fly 15s linear infinite;
-            z-index: -1;
-            opacity: 0.1;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
 
-        @keyframes fly {
-            0% { transform: translate(0, -50%); }
-            100% { transform: translate(150vw, -50%); }
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Enhanced Header */
         .header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #002b5c 100%);
+            background: var(--secondary);
             padding: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
             position: relative;
             overflow: hidden;
         }
 
-        .header::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 200%;
-            height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent 25%,
-                rgba(255,255,255,0.1) 50%,
-                transparent 75%
-            );
-            animation: shine 3s infinite;
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        @keyframes shine {
-            100% { left: 100%; }
+        .header h1 {
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
         }
 
-        /* Improved Form Styling */
-        .input-group {
-            background: rgba(255,255,255,0.95);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1rem;
+        }
+
+        .main-container {
+            flex: 1;
+            max-width: 800px;
+            width: 100%;
             margin: 2rem auto;
-            max-width: 600px;
+            padding: 0 1.5rem;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
         }
 
         .input-field {
-            margin: 1.5rem 0;
-            position: relative;
-        }
-
-        .input-field input {
             width: 100%;
-            padding: 1rem;
-            border: 2px solid var(--primary-color);
+            padding: 0.875rem 1.25rem;
+            border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 1rem;
             transition: all 0.3s ease;
         }
 
-        /* Success Modal */
-        .success-modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            text-align: center;
-            z-index: 1000;
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(215,25,33,0.15);
         }
 
-
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #3e3e3e 0%, #000000 %);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .header {
-            width: 100%;
-            background: linear-gradient(90deg, var(--primary-color) 0%, #002b5c 100%);
-            padding: 1rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            animation: slideDown 0.8s ease-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-        }
-
-        .header img {
-            height: 50px;
-            width: auto;
-        }
-
-        .header-text {
+        .generate-btn {
+            background: var(--primary);
             color: white;
-            text-align: center;
-        }
-
-        .header-text h1 {
-            margin: 0;
-            font-size: 1.8rem;
-            letter-spacing: 2px;
-        }
-
-        .header-text p {
-            margin: 0;
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
-        .container {
-            flex: 1;
             width: 100%;
-            max-width: 1200px;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .input-group {
-            margin: 2rem 0;
-            text-align: center;
-            animation: fadeInUp 1s ease;
-        }
-
-        .flight-container {
+        .preview-container {
             position: relative;
             margin: 2rem 0;
-            perspective: 1000px;
-        }
-
-        #boarding-pass-container {
-            position: relative;
-            width: 1000px;
-            max-width: 100%;
-            margin: 0 auto;
-            transform-style: preserve-3d;
-            transition: transform 0.6s;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            border-radius: 15px;
-            overflow: hidden;
+            width: 100%;
+            aspect-ratio: 5/3; /* Maintain 1000x600 ratio */
         }
 
         #boarding-pass-image {
@@ -185,174 +115,22 @@
 
         .passenger-name {
             position: absolute;
-            color: var(--primary-color);
-            font-weight: 700;
-            font-size: 24px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            color: var(--secondary);
+            font-weight: 500;
+            font-size: 18px; /* Responsive font size */
         }
 
-        #left-name {
-            left: 145px;
-            top: 130px;
-        }
+        #left-name { left: 14.5%; top: 130px; }
+        #right-name { left: 71.2%; top: 140px; color: white; }
 
-        #right-name {
-            left: 712px;
-            top: 145px;
-            color: white;
-            font-size: 18px;
-        }
-
-        .input-field {
-            position: relative;
-            margin: 2rem 0;
-        }
-
-        .input-field input {
-            padding: 1.2rem 2rem;
-            font-size: 1.1rem;
-            width: 300px;
-            max-width: 90%;
-            border: 2px solid var(--primary-color);
-            border-radius: 50px;
-            background: rgba(255,255,255,0.9);
-            transition: all 0.3s ease;
-        }
-
-        .input-field input:focus {
-            outline: none;
-            box-shadow: 0 0 15px rgba(0,31,77,0.2);
-            transform: scale(1.02);
-        }
-
-        .generate-btn {
-            background: var(--primary-color);
-            color: white;
-            padding: 1.2rem 3rem;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,31,77,0.3);
-        }
-
-        .generate-btn:hover {
-            background: #002b5c;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,31,77,0.4);
-        }
-
-        .generate-btn:active {
-            transform: translateY(1px);
-        }
-
-        /* Animations */
-        @keyframes slideDown {
-            from { transform: translateY(-100%); }
-            to { transform: translateY(0); }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            #boarding-pass-container {
-                width: 100%;
-                border-radius: 10px;
-            }
-
-        @media (max-width: 768px) {
-            #boarding-pass-container {
-                transform: scale(0.8);
-                margin: 20px 0;
-            }
-        }
-
-        @media (max-width: 480px) {
-            #boarding-pass-container {
-                transform: scale(0.7);
-            }
-        }
-
-            .passenger-name {
-                font-size: 18px;
-                pointer-events: none;
-            }
-
-            #left-name {
-                left: 12%;
-                top: 18%;
-            }
-
-            #right-name {
-                left: 62%;
-                top: 19%;
-                font-size: 14px;
-            }
-
-            .header-text h1 {
-                font-size: 1.4rem;
-            }
-
-            .input-field input {
-                padding: 1rem;
-                font-size: 1rem;
-            }
-
-            .generate-btn {
-                padding: 1rem 2rem;
-                font-size: 1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            #left-name {
-                left: 10%;
-                top: 16%;
-                font-size: 16px;
-            }
-
-            #right-name {
-                left: 60%;
-                top: 17%;
-                font-size: 12px;
-            }
-
-            .header {
-                padding: 0.8rem;
-            }
-
-            .header img {
-                height: 40px;
-            }
-        }
-
-        .loading {
+        .loading-overlay {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.95);
             z-index: 999;
             justify-content: center;
             align-items: center;
@@ -361,149 +139,167 @@
         .spinner {
             width: 50px;
             height: 50px;
-            border: 5px solid var(--primary-color);
+            border: 4px solid var(--primary);
             border-top-color: transparent;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+        }
+
+        .success-modal {
+            display: none;
+            position: fixed;
+            width: 500px;
+            height: 250px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            z-index: 1000;
+            max-width: 90%;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        .data-fields {
-            display: grid;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.5rem; }
+            .header p { font-size: 0.875rem; }
+            .form-card { padding: 1.5rem; }
+            .passenger-name { font-size: 5%; }
         }
-
-        /* PDF Size Fix */
-        #boarding-pass-container {
-            width: 1000px;
-            height: 600px; /* Match your image aspect ratio */
-        }
-        
     </style>
 </head>
 <body>
-    <div class="plane-container">
-        <i class="fas fa-plane fa-3x"></i>
-    </div>
-
-    <div class="header">
+    <header class="header">
+        <div class="header-content">
             <h1>ARAVALI AIRLINES</h1>
             <p>A Final Goodbye ✈️ Memories That Soar High</p>
         </div>
-    </div>
+    </header>
 
-    <div class="container">
-        <div class="input-group">
-            <div class="data-fields">
-                <div class="input-field">
-                    <input type="text" id="name-input" placeholder="Full Name *" required>
-                </div>
-                <div class="input-field">
-                    <input type="text" id="class-input" placeholder="Class">
-                </div>
-                <div class="input-field">
-                    <input type="tel" id="phone-input" placeholder="Phone Number">
-                </div>
+    <main class="main-container">
+        <div class="form-card">
+            <div class="form-group">
+                <input type="text" class="input-field" id="name-input" placeholder="Full Name" required>
+            </div>
+            <div class="form-group">
+                <input type="text" class="input-field" id="class-input" placeholder="Class">
+            </div>
+            <div class="form-group">
+                <input type="tel" class="input-field" id="phone-input" placeholder="Phone Number">
             </div>
             <button class="generate-btn" onclick="generatePDF()">
-                ✈️ Generate Boarding Pass
+                Generate Boarding Pass
             </button>
         </div>
 
-    </div>
-
-        <div class="flight-container">
-            <div id="boarding-pass-container">
-                <img src="boarding-pass.png" id="boarding-pass-image">
-                <div class="passenger-name" id="left-name"></div>
-                <div class="passenger-name" id="right-name"></div>
-            </div>
+        <div class="preview-container">
+            <img src="boarding-pass.png" id="boarding-pass-image">
+            <div class="passenger-name" id="left-name"></div>
+            <div class="passenger-name" id="right-name"></div>
         </div>
-    </div>
+    </main>
 
-    <div class="loading">
+    <div class="loading-overlay" id="loading">
         <div class="spinner"></div>
     </div>
 
-
     <div class="success-modal" id="successModal">
-        <h3>Boarding Pass Generated Successfully! 🎫</h3>
-        <p>Your PDF is ready for download.</p>
-        <button class="generate-btn" onclick="document.getElementById('successModal').style.display = 'none'">
-            Close
+        <h3>🎫 Boarding Pass Ready!</h3>
+        <p>Your boarding pass has been generated successfully.</p>
+        <button class="generate-btn" onclick="hideSuccessModal()">
+            Continue
         </button>
     </div>
 
     <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxpw6O1iLD3DfXoq8E61yk0Vn-rdsfKqT8Rs9AwQ4vrDesI6Qg164Skt05PCSwIHZgo/exec';
 
+        async function generatePDF() {
+            const name = document.getElementById('name-input').value.trim();
+            const className = document.getElementById('class-input').value.trim();
+            const phone = document.getElementById('phone-input').value.trim();
 
-  
+            if (!name) return alert('Please enter your name');
 
+            document.getElementById('loading').style.display = 'flex';
+            
+            try {
+                // Update names and generate PDF
+                document.getElementById('left-name').textContent = name;
+                document.getElementById('right-name').textContent = name;
 
-        function generatePDF() {
-            const userName = document.getElementById('name-input').value.trim();
-            if (!userName) {
-                alert('Please enter your name');
-                return;
-            }
+                const container = document.querySelector('.preview-container');
+                const originalWidth = container.style.width;
+                const originalHeight = container.style.height;
+                container.style.width = '1000px';
+                container.style.height = '600px';
 
-            // Store original dimensions
-            const container = document.getElementById('boarding-pass-container');
-            const originalWidth = container.style.width;
-            const originalHeight = container.style.height;
-
-            // Force laptop layout dimensions
-            container.style.width = '1000px';
-            container.style.height = 'auto';
-
-            // Update both name fields
-            document.getElementById('left-name').textContent = userName;
-            document.getElementById('right-name').textContent = userName;
-
-            // Add rendering delay
-            setTimeout(() => {
-                html2canvas(container, {
-                    scale: 2,
-                    logging: true,
+                const canvas = await html2canvas(container, {
+                    scale: 3,
                     useCORS: true,
-                    width: 1000, // Force canvas width
-                    height: 600, // Adjust based on your image height
-                    windowWidth: 1000 // Force render width
-                }).then(canvas => {
-                    const pdf = new jspdf.jsPDF({
-                        orientation: 'landscape',
-                        unit: 'px',
-                        format: [1000, 600] // Match your image dimensions
-                    });
-
-                    pdf.addImage(canvas, 'PNG', 0, 0, 1000, 600);
-                    pdf.save(`${userName}-boarding-pass.pdf`);
-
-                    // Reset container dimensions
-                    container.style.width = originalWidth;
-                    container.style.height = originalHeight;
-                    document.querySelector('.loading').style.display = 'none';
-                }).catch(error => {
-                    console.error('Error:', error);
-                    container.style.width = originalWidth;
-                    container.style.height = originalHeight;
-                    document.querySelector('.loading').style.display = 'none';
+                    width: 1000,
+                    height: 600,
+                    windowWidth: 1000
                 });
-            }, 500);
+
+                const pdf = new jspdf.jsPDF({
+                    orientation: 'landscape',
+                    unit: 'px',
+                    format: [1000, 600]
+                });
+
+                pdf.addImage(canvas, 'PNG', 0, 0, 1000, 600);
+                
+                // User download
+                pdf.save(`${name}-boarding-pass.pdf`);
+
+                // Admin copy handling
+                const pdfBlob = pdf.output('blob');
+                const reader = new FileReader();
+                reader.readAsDataURL(pdfBlob);
+                
+                reader.onloadend = async () => {
+                    const base64PDF = reader.result.split(',')[1]; // Remove data URL prefix
+                    
+                    try {
+                        await fetch(scriptURL, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                name: name,
+                                class: className,
+                                phone: phone,
+                                pdf: base64PDF
+                            })
+                        });
+                    } catch (error) {
+                        console.error('Admin copy failed:', error);
+                    }
+                };
+
+                document.getElementById('successModal').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Generation failed. Please try again.');
+            } finally {
+                container.style.width = originalWidth;
+                container.style.height = originalHeight;
+                document.getElementById('loading').style.display = 'none';
+            }
         }
-        document.getElementById('successModal').style.display = 'block';
 
-
-        function adjustPDFSize() {
-            const container = document.getElementById('boarding-pass-container');
-            container.style.width = 'auto';
-            container.style.height = 'auto'; // Match your image ratio
+        function hideSuccessModal() {
+            document.getElementById('successModal').style.display = 'none';
         }
-
-        </script>
+    </script>
 </body>
 </html>
