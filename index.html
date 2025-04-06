@@ -228,78 +228,81 @@
     </div>
 
     <script>
-       const scriptURL = 'https://script.google.com/macros/s/AKfycbx7hvkYDK733rGVOJGDnwOEBhMmTbY26WICNuKQxg0Y1pqrqCGvJFt3_B05TORnLrQ2Gw/exec';
-
-async function generatePDF() {
-    const name = document.getElementById('name-input').value.trim();
-    const className = document.getElementById('class-input').value.trim();
-    const phone = document.getElementById('phone-input').value.trim();
-
-    if (!name) return alert('Please enter your name');
-
-    const loadingOverlay = document.getElementById('loading');
-    loadingOverlay.style.display = 'flex';
-
-    try {
-        // Update display elements
-        document.querySelectorAll('[id$="-name"]').forEach(el => el.textContent = name);
-        document.querySelectorAll('[id$="-class"]').forEach(el => el.textContent = className);
-
-        // Force DOM update
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        // Capture container
-        const container = document.querySelector('.preview-container');
-        const canvas = await html2canvas(container, {
-            scale: 3,
-            useCORS: true,
-            logging: true,
-            allowTaint: true,
-            width: 750,
-            height: 500,
-            windowWidth: 1000
-        });
-
-        // Generate PDF
-        const pdf = new jspdf.jsPDF({
-            orientation: 'landscape',
-            unit: 'px',
-            format: [1000, 600]
-        });
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 1000, 600);
-
-        // Save and submit
-        const pdfBlob = pdf.output('blob');
-        const reader = new FileReader();
-        reader.readAsDataURL(pdfBlob);
+        // PROPERLY INITIALIZED SCRIPT URL
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwdvKFbvHe1Z-TXzYnTRjBciOifuOkn5mFquq9qhpr39LpSmejZMoOzVALYidPbb-bnSw/exec';
         
-        reader.onloadend = async () => {
-            const base64PDF = reader.result.split(',')[1];
-            
-            // Submit data
-            await fetch(scriptURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: name,
-                    class: className,
-                    phone: phone,
-                    pdf: base64PDF,
-                    timestamp: new Date().toISOString()
-                })
-            });
-        };
-
-        pdf.save(`${name}-boarding-pass.pdf`);
-        document.getElementById('successModal').style.display = 'block';
-
-    } catch (error) {
-        console.error('Generation Error:', error);
-        alert(`Failed: ${error.message}`);
-    } finally {
-        loadingOverlay.style.display = 'none';
-    }
-}
-    </script>
-</body>
-</html>
+        async function generatePDF() {
+            const name = document.getElementById('name-input').value.trim();
+            const className = document.getElementById('class-input').value.trim();
+            const phone = document.getElementById('phone-input').value.trim();
+        
+            if (!name) return alert('Please enter your name');
+        
+            const loadingOverlay = document.getElementById('loading');
+            loadingOverlay.style.display = 'flex';
+        
+            try {
+                // Update display elements
+                document.querySelectorAll('[id$="-name"]').forEach(el => el.textContent = name);
+                document.querySelectorAll('[id$="-class"]').forEach(el => el.textContent = className);
+        
+                await new Promise(resolve => setTimeout(resolve, 50));
+        
+                const container = document.querySelector('.preview-container');
+                const canvas = await html2canvas(container, {
+                    scale: 1,
+                    useCORS: true,
+                    width: 1000,
+                    height: 600
+                });
+        
+                const pdf = new jspdf.jsPDF({
+                    orientation: 'landscape',
+                    unit: 'px',
+                    format: [1000, 600]
+                });
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 1000, 600);
+        
+                // Convert to base64
+                const pdfBase64 = btoa(pdf.output('arraybuffer'));
+        
+                // Create hidden form
+                const form = document.createElement('form');
+                form.style.display = 'none';
+                form.action = scriptURL;
+                form.method = 'GET';
+        
+                // SAFE PARAMETER HANDLING
+                const params = {
+                    name: encodeURIComponent(name),
+                    class: encodeURIComponent(className),
+                    phone: encodeURIComponent(phone),
+                    pdf: encodeURIComponent(pdfBase64),
+                    callback: 'handleResponse'
+                };
+        
+                Object.entries(params).forEach(([key, value]) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value;
+                    form.appendChild(input);
+                });
+        
+                document.body.appendChild(form);
+                form.submit();
+        
+                pdf.save(`${name}-boarding-pass.pdf`);
+                document.getElementById('successModal').style.display = 'block';
+        
+            } catch (error) {
+                console.error('Error:', error);
+                alert(`Failed: ${error.message}`);
+            } finally {
+                loadingOverlay.style.display = 'none';
+            }
+        }
+        </script>
+        </body>
+        </html>
+        
