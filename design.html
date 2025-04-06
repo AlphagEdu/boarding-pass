@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARAVALI Airlines - Boarding Pass</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        /* Emirates-style CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+        }
+
+        .header {
+            background: #001538;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            width: 180px;
+        }
+
+        .nav {
+            margin-left: auto;
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-item {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .main-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .checkin-box {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 40px;
+        }
+
+        .title {
+            color: #001538;
+            font-size: 28px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .input-label {
+            display: block;
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #d71921;
+            box-shadow: 0 0 0 2px rgba(215,25,33,0.1);
+        }
+
+        .generate-btn {
+            background: #d71921;
+            color: #fff;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .generate-btn:hover {
+            background: #b3151c;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .modal-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #001538;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+            
+            .main-container {
+                margin: 20px auto;
+            }
+            
+            .checkin-box {
+                padding: 25px;
+            }
+            
+            .title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <img src="school.png" class="logo" alt="Aravali Airlines">
+            <nav class="nav">
+                <a href="#" class="nav-item">Manage</a>
+                <a href="#" class="nav-item">Help</a>
+                <a href="#" class="nav-item">Sign In</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="checkin-box">
+            <h1 class="title">Generate Boarding Pass</h1>
+            <div class="form-group">
+                <label class="input-label">Full Name</label>
+                <input type="text" class="input-field" id="name-input" required>
+            </div>
+            <div class="form-group">
+                <label class="input-label">Class</label>
+                <input type="text" class="input-field" id="class-input">
+            </div>
+            <div class="form-group">
+                <label class="input-label">Phone Number</label>
+                <input type="tel" class="input-field" id="phone-input">
+            </div>
+            <button class="generate-btn" onclick="generatePDF()">Generate Boarding Pass</button>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content">
+            <p class="modal-text">✅ Boarding pass generated successfully!</p>
+            <button class="generate-btn" onclick="hideModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Hidden Boarding Pass Template -->
+    <div id="boarding-pass-container" style="display: none;">
+        <!-- Your boarding pass design here -->
+    </div>
+
+    <script>
+        function generatePDF() {
+            const userName = document.getElementById('name-input').value.trim();
+            if (!userName) {
+                alert('Please enter your name');
+                return;
+            }
+
+            // Store original dimensions
+            const container = document.getElementById('boarding-pass-container');
+            const originalWidth = container.style.width;
+            const originalHeight = container.style.height;
+
+            // Force laptop layout dimensions
+            container.style.width = '1000px';
+            container.style.height = 'auto';
+
+            // Update both name fields
+            document.getElementById('left-name').textContent = userName;
+            document.getElementById('right-name').textContent = userName;
+
+            // Add rendering delay
+            setTimeout(() => {
+                html2canvas(container, {
+                    scale: 2,
+                    logging: true,
+                    useCORS: true,
+                    width: 1000, // Force canvas width
+                    height: 600, // Adjust based on your image height
+                    windowWidth: 1000 // Force render width
+                }).then(canvas => {
+                    const pdf = new jspdf.jsPDF({
+                        orientation: 'landscape',
+                        unit: 'px',
+                        format: [1000, 600] // Match your image dimensions
+                    });
+
+                    pdf.addImage(canvas, 'PNG', 0, 0, 1000, 600);
+                    pdf.save(`${userName}-boarding-pass.pdf`);
+
+                    // Reset container dimensions
+                    container.style.width = originalWidth;
+                    container.style.height = originalHeight;
+                    document.querySelector('.loading').style.display = 'none';
+                }).catch(error => {
+                    console.error('Error:', error);
+                    container.style.width = originalWidth;
+                    container.style.height = originalHeight;
+                    document.querySelector('.loading').style.display = 'none';
+                });
+            }, 500);
+        }
+        document.getElementById('successModal').style.display = 'block';
+
+
+        function adjustPDFSize() {
+            const container = document.getElementById('boarding-pass-container');
+            container.style.width = 'auto';
+            container.style.height = 'auto'; // Match your image ratio
+        }
+
+
+        
+
+        // Data collection
+        async function collectData() {
+            const formData = {
+                name: document.getElementById('name-input').value,
+                class: document.getElementById('class-input').value,
+                phone: document.getElementById('phone-input').value,
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                await fetch('YOUR_ENDPOINT', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
