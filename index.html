@@ -1,308 +1,1217 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>ARAVALI Airlines - Boarding Pass</title>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
+
         :root {
+
             --primary: #D71921;
+
             --secondary: #001538;
+
             --accent: #FFD700;
+
             --text: #2D2D2D;
+
         }
+
+
 
         * {
+
             margin: 0;
+
             padding: 0;
+
             box-sizing: border-box;
+
             font-family: 'Segoe UI', system-ui, sans-serif;
+
         }
+
+
 
         body {
+
             background: #f8f9fa;
+
             min-height: 100vh;
+
             display: flex;
+
             flex-direction: column;
+
         }
+
+
 
         .header {
+
             background: var(--secondary);
+
             padding: 1.5rem;
+
             text-align: center;
+
             position: relative;
+
             overflow: hidden;
+
         }
+
+
 
         .header-content {
+
             max-width: 1200px;
+
             margin: 0 auto;
+
         }
+
+
 
         .header h1 {
+
             color: white;
+
             font-size: 2rem;
+
             margin-bottom: 0.5rem;
+
         }
+
+
 
         .header p {
+
             color: rgba(255,255,255,0.9);
+
             font-size: 1rem;
+
         }
+
+
 
         .main-container {
+
             flex: 1;
+
             max-width: 800px;
+
             width: 100%;
+
             margin: 2rem auto;
+
             padding: 0 1.5rem;
+
         }
+
+
 
         .form-card {
+
             background: white;
+
             border-radius: 12px;
+
             box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+
             padding: 2rem;
+
             margin-bottom: 2rem;
+
         }
+
+
 
         .form-group {
+
             margin-bottom: 1.5rem;
+
         }
+
+
 
         .input-field {
+
             width: 100%;
+
             padding: 0.875rem 1.25rem;
+
             border: 2px solid #e0e0e0;
+
             border-radius: 8px;
+
             font-size: 1rem;
+
             transition: all 0.3s ease;
+
         }
+
+
 
         .input-field:focus {
+
             outline: none;
+
             border-color: var(--primary);
+
             box-shadow: 0 0 0 3px rgba(215,25,33,0.15);
+
         }
+
+
 
         .generate-btn {
+
             background: var(--primary);
+
             color: white;
+
             width: 100%;
+
             padding: 1rem;
+
             border: none;
+
             border-radius: 8px;
+
             font-size: 1.1rem;
+
             cursor: pointer;
+
             transition: all 0.3s ease;
+
         }
+
+
 
         .preview-container {
+
             position: relative;
+
             margin: 2rem 0;
+
             width: 100%;
+
             aspect-ratio: 5/3; /* Maintain 1000x600 ratio */
+
         }
+
+
 
         #boarding-pass-image {
+
             width: 100%;
+
             height: auto;
+
             display: block;
+
         }
+
+
 
         .passenger-name {
+
             position: absolute;
+
             color: var(--secondary);
+
             font-weight: 500;
+
             font-size: 18px; /* Responsive font size */
+
         }
 
-        #left-name { left: 14.5%; top: 95px; }
-        #right-name { left: 71.2%; top: 103px; color: white; }
-        #right-class { left: 49.2%; top: 200px; font-size: 10px; }
+
+
+        #left-name { left: 14.5%; top: 130px; }
+
+        #right-name { left: 71.2%; top: 140px; color: white; }
+
 
 
         .loading-overlay {
+
             display: none;
+
             position: fixed;
+
             top: 0;
+
             left: 0;
+
             width: 100%;
+
             height: 100%;
+
             background: rgba(255,255,255,0.95);
+
             z-index: 999;
+
             justify-content: center;
+
             align-items: center;
+
         }
+
+
 
         .spinner {
+
             width: 50px;
+
             height: 50px;
+
             border: 4px solid var(--primary);
+
             border-top-color: transparent;
+
             border-radius: 50%;
+
             animation: spin 1s linear infinite;
+
         }
+
+
 
         .success-modal {
+
             display: none;
+
             position: fixed;
+
             width: 500px;
+
             height: 250px;
+
             top: 50%;
+
             left: 50%;
+
             transform: translate(-50%, -50%);
+
             background: white;
+
             padding: 2rem;
+
             border-radius: 12px;
+
             box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+
             text-align: center;
+
             z-index: 1000;
+
             max-width: 90%;
+
         }
 
-        .passenger-class {
-            position: absolute;
-            color: var(--secondary);
-            font-weight: 500;
-            font-size: 16px;
-        }
+
 
         @keyframes spin {
+
             to { transform: rotate(360deg); }
+
         }
+
+
 
         @media (max-width: 768px) {
+
             .header h1 { font-size: 1.5rem; }
+
             .header p { font-size: 0.875rem; }
+
             .form-card { padding: 1.5rem; }
+
             .passenger-name { font-size: 5%; }
+
         }
+
     </style>
+
 </head>
+
 <body>
+
     <header class="header">
+
         <div class="header-content">
+
             <h1>ARAVALI AIRLINES</h1>
+
             <p>A Final Goodbye ✈️ Memories That Soar High</p>
+
         </div>
+
     </header>
 
+
+
     <main class="main-container">
+
         <div class="form-card">
+
             <div class="form-group">
+
                 <input type="text" class="input-field" id="name-input" placeholder="Full Name" required>
+
             </div>
+
             <div class="form-group">
-                <input type="text" class="input-field" id="class-input" placeholder="Class eg: 12S1">
+
+                <input type="text" class="input-field" id="class-input" placeholder="Class">
+
             </div>
+
             <div class="form-group">
+
                 <input type="tel" class="input-field" id="phone-input" placeholder="Phone Number">
+
             </div>
+
             <button class="generate-btn" onclick="generatePDF()">
+
                 Generate Boarding Pass
+
             </button>
+
         </div>
+
+
 
         <div class="preview-container">
+
             <img src="boarding-pass.png" id="boarding-pass-image">
+
             <div class="passenger-name" id="left-name"></div>
+
             <div class="passenger-name" id="right-name"></div>
-            <div class="passenger-class" id="right-class"></div>
+
         </div>
+
     </main>
 
+
+
     <div class="loading-overlay" id="loading">
+
         <div class="spinner"></div>
+
     </div>
+
+
 
     <div class="success-modal" id="successModal">
+
         <h3>🎫 Boarding Pass Ready!</h3>
+
         <p>Your boarding pass has been generated successfully.</p>
+
         <button class="generate-btn" onclick="hideSuccessModal()">
+
             Continue
+
         </button>
+
     </div>
 
+
+
     <script>
-        // PROPERLY INITIALIZED SCRIPT URL
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyNp4-DEsYQYDLIXuOQ1B5K0OeOv66FHcFczvRkWq53WTN8xbX1XvsBQ6_k73sVpYmx/exec';
-        
+
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxpw6O1iLD3DfXoq8E61yk0Vn-rdsfKqT8Rs9AwQ4vrDesI6Qg164Skt05PCSwIHZgo/exec';
+
+
+
         async function generatePDF() {
+
             const name = document.getElementById('name-input').value.trim();
+
             const className = document.getElementById('class-input').value.trim();
+
             const phone = document.getElementById('phone-input').value.trim();
-        
+
+
+
             if (!name) return alert('Please enter your name');
-        
-            const loadingOverlay = document.getElementById('loading');
-            loadingOverlay.style.display = 'flex';
-        
+
+
+
+            document.getElementById('loading').style.display = 'flex';
+
+            
+
             try {
-                // Update display elements
-                document.querySelectorAll('[id$="-name"]').forEach(el => el.textContent = name);
-                document.querySelectorAll('[id$="-class"]').forEach(el => el.textContent = className);
-        
-                await new Promise(resolve => setTimeout(resolve, 50));
-        
+
+                // Update names and generate PDF
+
+                document.getElementById('left-name').textContent = name;
+
+                document.getElementById('right-name').textContent = name;
+
+
+
                 const container = document.querySelector('.preview-container');
+
+                const originalWidth = container.style.width;
+
+                const originalHeight = container.style.height;
+
+                container.style.width = '1000px';
+
+                container.style.height = '600px';
+
+
+
                 const canvas = await html2canvas(container, {
-                    scale: 1,
+
+                    scale: 3,
+
                     useCORS: true,
+
                     width: 1000,
-                    height: 600
+
+                    height: 600,
+
+                    windowWidth: 1000
+
                 });
-        
+
+
+
                 const pdf = new jspdf.jsPDF({
+
                     orientation: 'landscape',
+
                     unit: 'px',
+
                     format: [1000, 600]
+
                 });
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 1000, 600);
-        
-                // Convert to base64
-                const pdfBase64 = btoa(pdf.output('arraybuffer'));
-        
-                // Create hidden form
-                const form = document.createElement('form');
-                form.style.display = 'none';
-                form.action = scriptURL;
-                form.method = 'GET';
-        
-                // SAFE PARAMETER HANDLING
-                const params = {
-                    name: encodeURIComponent(name),
-                    class: encodeURIComponent(className),
-                    phone: encodeURIComponent(phone),
-                    pdf: encodeURIComponent(pdfBase64),
-                    callback: 'handleResponse'
-                };
-        
-                Object.entries(params).forEach(([key, value]) => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = key;
-                    input.value = value;
-                    form.appendChild(input);
-                });
-        
-                document.body.appendChild(form);
-                form.submit();
-        
+
+
+
+                pdf.addImage(canvas, 'PNG', 0, 0, 1000, 600);
+
+                
+
+                // User download
+
                 pdf.save(`${name}-boarding-pass.pdf`);
+
+
+
+                // Admin copy handling
+
+                const pdfBlob = pdf.output('blob');
+
+                const reader = new FileReader();
+
+                reader.readAsDataURL(pdfBlob);
+
+                
+
+                reader.onloadend = async () => {
+
+                    const base64PDF = reader.result.split(',')[1]; // Remove data URL prefix
+
+                    
+
+                    try {
+
+                        await fetch(scriptURL, {
+
+                            method: 'POST',
+
+                            headers: {
+
+                                'Content-Type': 'application/json'
+
+                            },
+
+                            body: JSON.stringify({
+
+                                name: name,
+
+                                class: className,
+
+                                phone: phone,
+
+                                pdf: base64PDF
+
+                            })
+
+                        });
+
+                    } catch (error) {
+
+                        console.error('Admin copy failed:', error);
+
+                    }
+
+                };
+
+
+
                 document.getElementById('successModal').style.display = 'block';
-        
+
+
+
             } catch (error) {
+
                 console.error('Error:', error);
-                alert(`Failed: ${error.message}`);
+
+                alert('Generation failed. Please try again.');
+
             } finally {
-                loadingOverlay.style.display = 'none';
+
+                container.style.width = originalWidth;
+
+                container.style.height = originalHeight;
+
+                document.getElementById('loading').style.display = 'none';
+
             }
+
         }
-        </script>
-        </body>
-        </html>
-        
+
+
+
+        function hideSuccessModal() {
+
+            document.getElementById('successModal').style.display = 'none';
+
+        }
+
+    </script>
+
+</body>
+
+</html><!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ARAVALI Airlines - Boarding Pass</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+
+        :root {
+
+            --primary: #D71921;
+
+            --secondary: #001538;
+
+            --accent: #FFD700;
+
+            --text: #2D2D2D;
+
+        }
+
+
+
+        * {
+
+            margin: 0;
+
+            padding: 0;
+
+            box-sizing: border-box;
+
+            font-family: 'Segoe UI', system-ui, sans-serif;
+
+        }
+
+
+
+        body {
+
+            background: #f8f9fa;
+
+            min-height: 100vh;
+
+            display: flex;
+
+            flex-direction: column;
+
+        }
+
+
+
+        .header {
+
+            background: var(--secondary);
+
+            padding: 1.5rem;
+
+            text-align: center;
+
+            position: relative;
+
+            overflow: hidden;
+
+        }
+
+
+
+        .header-content {
+
+            max-width: 1200px;
+
+            margin: 0 auto;
+
+        }
+
+
+
+        .header h1 {
+
+            color: white;
+
+            font-size: 2rem;
+
+            margin-bottom: 0.5rem;
+
+        }
+
+
+
+        .header p {
+
+            color: rgba(255,255,255,0.9);
+
+            font-size: 1rem;
+
+        }
+
+
+
+        .main-container {
+
+            flex: 1;
+
+            max-width: 800px;
+
+            width: 100%;
+
+            margin: 2rem auto;
+
+            padding: 0 1.5rem;
+
+        }
+
+
+
+        .form-card {
+
+            background: white;
+
+            border-radius: 12px;
+
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+
+            padding: 2rem;
+
+            margin-bottom: 2rem;
+
+        }
+
+
+
+        .form-group {
+
+            margin-bottom: 1.5rem;
+
+        }
+
+
+
+        .input-field {
+
+            width: 100%;
+
+            padding: 0.875rem 1.25rem;
+
+            border: 2px solid #e0e0e0;
+
+            border-radius: 8px;
+
+            font-size: 1rem;
+
+            transition: all 0.3s ease;
+
+        }
+
+
+
+        .input-field:focus {
+
+            outline: none;
+
+            border-color: var(--primary);
+
+            box-shadow: 0 0 0 3px rgba(215,25,33,0.15);
+
+        }
+
+
+
+        .generate-btn {
+
+            background: var(--primary);
+
+            color: white;
+
+            width: 100%;
+
+            padding: 1rem;
+
+            border: none;
+
+            border-radius: 8px;
+
+            font-size: 1.1rem;
+
+            cursor: pointer;
+
+            transition: all 0.3s ease;
+
+        }
+
+
+
+        .preview-container {
+
+            position: relative;
+
+            margin: 2rem 0;
+
+            width: 100%;
+
+            aspect-ratio: 5/3; /* Maintain 1000x600 ratio */
+
+        }
+
+
+
+        #boarding-pass-image {
+
+            width: 100%;
+
+            height: auto;
+
+            display: block;
+
+        }
+
+
+
+        .passenger-name {
+
+            position: absolute;
+
+            color: var(--secondary);
+
+            font-weight: 500;
+
+            font-size: 18px; /* Responsive font size */
+
+        }
+
+
+
+        #left-name { left: 14.5%; top: 130px; }
+
+        #right-name { left: 71.2%; top: 140px; color: white; }
+
+
+
+        .loading-overlay {
+
+            display: none;
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            background: rgba(255,255,255,0.95);
+
+            z-index: 999;
+
+            justify-content: center;
+
+            align-items: center;
+
+        }
+
+
+
+        .spinner {
+
+            width: 50px;
+
+            height: 50px;
+
+            border: 4px solid var(--primary);
+
+            border-top-color: transparent;
+
+            border-radius: 50%;
+
+            animation: spin 1s linear infinite;
+
+        }
+
+
+
+        .success-modal {
+
+            display: none;
+
+            position: fixed;
+
+            width: 500px;
+
+            height: 250px;
+
+            top: 50%;
+
+            left: 50%;
+
+            transform: translate(-50%, -50%);
+
+            background: white;
+
+            padding: 2rem;
+
+            border-radius: 12px;
+
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+
+            text-align: center;
+
+            z-index: 1000;
+
+            max-width: 90%;
+
+        }
+
+
+
+        @keyframes spin {
+
+            to { transform: rotate(360deg); }
+
+        }
+
+
+
+        @media (max-width: 768px) {
+
+            .header h1 { font-size: 1.5rem; }
+
+            .header p { font-size: 0.875rem; }
+
+            .form-card { padding: 1.5rem; }
+
+            .passenger-name { font-size: 5%; }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <header class="header">
+
+        <div class="header-content">
+
+            <h1>ARAVALI AIRLINES</h1>
+
+            <p>A Final Goodbye ✈️ Memories That Soar High</p>
+
+        </div>
+
+    </header>
+
+
+
+    <main class="main-container">
+
+        <div class="form-card">
+
+            <div class="form-group">
+
+                <input type="text" class="input-field" id="name-input" placeholder="Full Name" required>
+
+            </div>
+
+            <div class="form-group">
+
+                <input type="text" class="input-field" id="class-input" placeholder="Class">
+
+            </div>
+
+            <div class="form-group">
+
+                <input type="tel" class="input-field" id="phone-input" placeholder="Phone Number">
+
+            </div>
+
+            <button class="generate-btn" onclick="generatePDF()">
+
+                Generate Boarding Pass
+
+            </button>
+
+        </div>
+
+
+
+        <div class="preview-container">
+
+            <img src="boarding-pass.png" id="boarding-pass-image">
+
+            <div class="passenger-name" id="left-name"></div>
+
+            <div class="passenger-name" id="right-name"></div>
+
+        </div>
+
+    </main>
+
+
+
+    <div class="loading-overlay" id="loading">
+
+        <div class="spinner"></div>
+
+    </div>
+
+
+
+    <div class="success-modal" id="successModal">
+
+        <h3>🎫 Boarding Pass Ready!</h3>
+
+        <p>Your boarding pass has been generated successfully.</p>
+
+        <button class="generate-btn" onclick="hideSuccessModal()">
+
+            Continue
+
+        </button>
+
+    </div>
+
+
+
+    <script>
+
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxpw6O1iLD3DfXoq8E61yk0Vn-rdsfKqT8Rs9AwQ4vrDesI6Qg164Skt05PCSwIHZgo/exec';
+
+
+
+        async function generatePDF() {
+
+            const name = document.getElementById('name-input').value.trim();
+
+            const className = document.getElementById('class-input').value.trim();
+
+            const phone = document.getElementById('phone-input').value.trim();
+
+
+
+            if (!name) return alert('Please enter your name');
+
+
+
+            document.getElementById('loading').style.display = 'flex';
+
+            
+
+            try {
+
+                // Update names and generate PDF
+
+                document.getElementById('left-name').textContent = name;
+
+                document.getElementById('right-name').textContent = name;
+
+
+
+                const container = document.querySelector('.preview-container');
+
+                const originalWidth = container.style.width;
+
+                const originalHeight = container.style.height;
+
+                container.style.width = '1000px';
+
+                container.style.height = '600px';
+
+
+
+                const canvas = await html2canvas(container, {
+
+                    scale: 3,
+
+                    useCORS: true,
+
+                    width: 1000,
+
+                    height: 600,
+
+                    windowWidth: 1000
+
+                });
+
+
+
+                const pdf = new jspdf.jsPDF({
+
+                    orientation: 'landscape',
+
+                    unit: 'px',
+
+                    format: [1000, 600]
+
+                });
+
+
+
+                pdf.addImage(canvas, 'PNG', 0, 0, 1000, 600);
+
+                
+
+                // User download
+
+                pdf.save(`${name}-boarding-pass.pdf`);
+
+
+
+                // Admin copy handling
+
+                const pdfBlob = pdf.output('blob');
+
+                const reader = new FileReader();
+
+                reader.readAsDataURL(pdfBlob);
+
+                
+
+                reader.onloadend = async () => {
+
+                    const base64PDF = reader.result.split(',')[1]; // Remove data URL prefix
+
+                    
+
+                    try {
+
+                        await fetch(scriptURL, {
+
+                            method: 'POST',
+
+                            headers: {
+
+                                'Content-Type': 'application/json'
+
+                            },
+
+                            body: JSON.stringify({
+
+                                name: name,
+
+                                class: className,
+
+                                phone: phone,
+
+                                pdf: base64PDF
+
+                            })
+
+                        });
+
+                    } catch (error) {
+
+                        console.error('Admin copy failed:', error);
+
+                    }
+
+                };
+
+
+
+                document.getElementById('successModal').style.display = 'block';
+
+
+
+            } catch (error) {
+
+                console.error('Error:', error);
+
+                alert('Generation failed. Please try again.');
+
+            } finally {
+
+                container.style.width = originalWidth;
+
+                container.style.height = originalHeight;
+
+                document.getElementById('loading').style.display = 'none';
+
+            }
+
+        }
+
+
+
+        function hideSuccessModal() {
+
+            document.getElementById('successModal').style.display = 'none';
+
+        }
+
+    </script>
+
+</body>
+
+</html>
